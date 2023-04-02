@@ -23,7 +23,7 @@ optionss = webdriver.FirefoxOptions()
 
 driver = webdriver.Firefox(options=optionss)
 yks_url = "https://forum.donanimhaber.com/yeni-konu-2642"
-msü_url = "https://forum.donanimhaber.com/yeni-konu-2642"
+msu_url = "https://forum.donanimhaber.com/yeni-konu-2642"
 ales_url = "https://forum.donanimhaber.com/yeni-konu-1997"
 yds_url = "https://forum.donanimhaber.com/yeni-konu-1996"
 tusvb_url = "https://forum.donanimhaber.com/yeni-konu-2703"
@@ -45,7 +45,7 @@ def durum(message):
     now = str(datetime.datetime.now())
     print(message+" "+now)
 
-def ösym_giris():
+def osym_giris():
     global image_path,result,my_list
     url = "https://sonuc.osym.gov.tr/"
     driver.get(url)
@@ -106,7 +106,7 @@ def kontrol():
         if ("YKS" in my_list[0]):
             konu_ac("YKS", yks_url)
         elif ("MSÜ" in my_list[0]):
-            konu_ac("MSÜ",msü_url)
+            konu_ac("MSÜ",msu_url)
         elif ("ALES" in my_list[0]):
             konu_ac("ALES",ales_url)
         elif ("YDS" in my_list[0]):
@@ -118,7 +118,7 @@ def kontrol():
 
 while True:
     try:
-        ösym_giris()
+        osym_giris()
         dosya_okuma()
         kontrol()
         time.sleep(20)
