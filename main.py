@@ -18,7 +18,7 @@ for channel in channels:
     apobj.add(channel)
 
 optionss = webdriver.FirefoxOptions()
-#optionss.add_argument('--headless')
+optionss.add_argument('--headless')
 
 
 driver = webdriver.Firefox(options=optionss)
