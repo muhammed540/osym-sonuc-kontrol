@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from apprise import Apprise
@@ -10,14 +8,18 @@ from selenium.webdriver.firefox.options import Options
 import requests
 import pickle
 
+
 # Telegram botu için sağlayıcı bilgileri
-channels = ['tgram://****/***','tgram://***/***']
+channels = ['tgram://***']
 apobj = Apprise()
 # Kanalları ekleme
 for channel in channels:
     apobj.add(channel)
 
 optionss = webdriver.FirefoxOptions()
+optionss.set_preference("network.http.prompt-temp-redirect", False)
+optionss.set_preference("network.http.prompt-temp-redirect.show-dialog", False)
+optionss.accept_insecure_certs= True
 optionss.add_argument('--headless')
 
 
@@ -35,15 +37,18 @@ def discordsend(message="çalıştı"):
         'content': message
     }
     response = requests.post(webhook_url, json=payload)
+    return response
 
 def discorderror(Ex):
     webhook_url = 'https://discord.com/api/webhooks/***'
     payload = {'content': f"{type(Ex).__name__}: {Ex}"}
     response = requests.post(webhook_url, json=payload)
+    return response
 
 def durum(message):
     now = str(datetime.datetime.now())
     print(message+" "+now)
+    return
 
 def osym_giris():
     global image_path,result,my_list
@@ -74,11 +79,9 @@ def konu_ac(sinav_adi,url):
     with open("newfile.txt", "r", encoding="utf-8") as file:
         first_line = file.readline().strip()  # İlk satırı oku ve '\n' karakterini atla
     link = driver.find_element(By.CSS_SELECTOR, "#grdSonuclar > tbody > tr:nth-child(2) > td:nth-child(1) > a")
-    link.click()
-    time.sleep(3)
-    current_url = driver.current_url
+    link2 = link.get_attribute("href")
     discordsend("mevcut url alındı")
-    apobj.notify(body=f'ÖSYM sonuçları değişti:\n{first_line}\n{current_url}', attach=image_path)
+    apobj.notify(body=f'Yeni Sınav Sonucu:\n{first_line}\n{link2}', attach=image_path)
     driver.get(url)
     cookies = pickle.load(open("cookies.pkl", "rb"))
     for cookie in cookies:
@@ -88,17 +91,20 @@ def konu_ac(sinav_adi,url):
     kbaslik = driver.find_element(By.CSS_SELECTOR, "#ilan-baslik-standard")
     kbaslik.click()
     kbaslik.send_keys(f"AÇIKLANDI {sinav_adi} (OTOMATİK MESAJ)")
-
+    discordsend("Başlık girildi")
     aciklama = driver.find_element(By.CSS_SELECTOR, ".ql-editor")
     aciklama.click
-    aciklama.send_keys(f"{first_line} AÇIKLANDI", Keys.ENTER, Keys.ENTER, current_url)
+    aciklama.send_keys(f"{first_line} AÇIKLANDI", Keys.ENTER, Keys.ENTER, link2)
+    discordsend("açıklama girildi")
     time.sleep(5)
 
     k_ac = driver.find_element(By.CSS_SELECTOR, "#editor-toolbar-container_0 > div > div > button")
     k_ac.click()
+    discordsend("konu açıldı")
     time.sleep(4)
     current_url2 = driver.current_url
     apobj.notify(body=f"Konu açtım: \n {current_url2}")
+    return
 
 def kontrol():
     
@@ -115,6 +121,7 @@ def kontrol():
             konu_ac("TUS/DUS/YDUS/EUS",tusvb_url)
         elif ("KPSS" in my_list[0]):
             konu_ac("KPSS",kpss_url)
+        return
 
 while True:
     try:
@@ -125,6 +132,3 @@ while True:
     except Exception as Ex:
         discorderror(Ex)
         time.sleep(20)
-        
-
-
