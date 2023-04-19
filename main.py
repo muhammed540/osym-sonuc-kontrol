@@ -4,10 +4,9 @@ from apprise import Apprise
 from selenium import webdriver
 import time
 import datetime
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.options import Options # Bu hiç kullanılmadığı için comment yaptım.
 import requests
 import pickle
-
 
 # Telegram botu için sağlayıcı bilgileri
 channels = ['tgram://***']
@@ -19,9 +18,8 @@ for channel in channels:
 optionss = webdriver.FirefoxOptions()
 optionss.set_preference("network.http.prompt-temp-redirect", False)
 optionss.set_preference("network.http.prompt-temp-redirect.show-dialog", False)
-optionss.accept_insecure_certs= True
+optionss.accept_insecure_certs = True
 optionss.add_argument('--headless')
-
 
 driver = webdriver.Firefox(options=optionss)
 yks_url = "https://forum.donanimhaber.com/yeni-konu-2642"
@@ -31,6 +29,7 @@ yds_url = "https://forum.donanimhaber.com/yeni-konu-1996"
 tusvb_url = "https://forum.donanimhaber.com/yeni-konu-2703"
 kpss_url = "https://forum.donanimhaber.com/yeni-konu-1995"
 
+
 def discordsend(message="çalıştı"):
     webhook_url = 'https://discord.com/api/webhooks/***'
     payload = {
@@ -39,19 +38,22 @@ def discordsend(message="çalıştı"):
     response = requests.post(webhook_url, json=payload)
     return response
 
-def discorderror(Ex):
+
+def discorderror(ex):
     webhook_url = 'https://discord.com/api/webhooks/***'
-    payload = {'content': f"{type(Ex).__name__}: {Ex}"}
+    payload = {'content': f"{type(ex).__name__}: {ex}"}
     response = requests.post(webhook_url, json=payload)
     return response
 
+
 def durum(message):
     now = str(datetime.datetime.now())
-    print(message+" "+now)
+    print(f"{message} {now}")
     return
 
+
 def osym_giris():
-    global image_path,result,my_list
+    global image_path, result, my_list
     url = "https://sonuc.osym.gov.tr/"
     driver.get(url)
     discordsend("ösym site girildi")
@@ -63,18 +65,20 @@ def osym_giris():
     for i in results:
         my_list.append(i.text)
     result = '\n'.join(my_list)
-    return result,image_path,my_list
+    return result, image_path, my_list
+
 
 def dosya_okuma():
     global content
-    with open("newfile.txt" , "r", encoding="utf-8") as f:
+    with open("newfile.txt", "r", encoding="utf-8") as f:
         content = f.read()
     discordsend("dosya okundu")
     return content
 
-def konu_ac(sinav_adi,url):
+
+def konu_ac(sinav_adi, url):
     discordsend("farklılık tespit edildi")
-    with open("newfile.txt" , "w", encoding="utf-8") as f:
+    with open("newfile.txt", "w", encoding="utf-8") as f:
         f.write(result)
     with open("newfile.txt", "r", encoding="utf-8") as file:
         first_line = file.readline().strip()  # İlk satırı oku ve '\n' karakterini atla
@@ -93,7 +97,7 @@ def konu_ac(sinav_adi,url):
     kbaslik.send_keys(f"AÇIKLANDI {sinav_adi} (OTOMATİK MESAJ)")
     discordsend("Başlık girildi")
     aciklama = driver.find_element(By.CSS_SELECTOR, ".ql-editor")
-    aciklama.click
+    aciklama.click()
     aciklama.send_keys(f"{first_line} AÇIKLANDI", Keys.ENTER, Keys.ENTER, link2)
     discordsend("açıklama girildi")
     time.sleep(5)
@@ -106,29 +110,35 @@ def konu_ac(sinav_adi,url):
     apobj.notify(body=f"Konu açtım: \n {current_url2}")
     return
 
+
 def kontrol():
-    
     if content != result and result != "":
         if ("YKS" in my_list[0]):
             konu_ac("YKS", yks_url)
         elif ("MSÜ" in my_list[0]):
-            konu_ac("MSÜ",msu_url)
+            konu_ac("MSÜ", msu_url)
         elif ("ALES" in my_list[0]):
-            konu_ac("ALES",ales_url)
+            konu_ac("ALES", ales_url)
         elif ("YDS" in my_list[0]):
-            konu_ac("YDS",yds_url)
+            konu_ac("YDS", yds_url)
         elif ("(TUS)" in my_list[0] or "(DUS)" in my_list[0] or "(YDUS)" in my_list[0] or "(EUS)" in my_list[0]):
-            konu_ac("TUS/DUS/YDUS/EUS",tusvb_url)
+            konu_ac("TUS/DUS/YDUS/EUS", tusvb_url)
         elif ("KPSS" in my_list[0]):
-            konu_ac("KPSS",kpss_url)
+            konu_ac("KPSS", kpss_url)
         return
 
-while True:
-    try:
-        osym_giris()
-        dosya_okuma()
-        kontrol()
-        time.sleep(20)
-    except Exception as Ex:
-        discorderror(Ex)
-        time.sleep(20)
+
+def main():
+    while True:
+        try:
+            osym_giris()
+            dosya_okuma()
+            kontrol()
+            time.sleep(20)
+        except Exception as Ex:
+            discorderror(Ex)
+            time.sleep(20)
+
+
+if __name__ == "__main__":
+    main()
