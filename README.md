@@ -1,4 +1,2 @@
 # osym-sonuc-kontrol
-ösym sonuçları açıklandığında donanımhabere konu açar
-
-Kod yazmada profesyonel değilim
+Ösym sonuçları açıklandığında donanımhabere konu açar. İstenilen telegram kanallarına mesaj gönderir.
