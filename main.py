@@ -4,9 +4,10 @@ from apprise import Apprise, AppriseAttachment
 from selenium import webdriver
 import time
 import datetime
-# from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.options import Options # Bu hiç kullanılmadığı için comment yaptım.
 import requests
 import pickle
+
 
 # Telegram botu için sağlayıcı bilgileri
 channels = ['tgram://***']
