@@ -11,7 +11,6 @@ import requests
 import pickle
 
 
-
 # Telegram botu için sağlayıcı bilgileri
 channels = os.getenv('CHANNELS')
 apobj = Apprise()
@@ -64,10 +63,6 @@ def osym_giris() -> AppriseAttachment:
         my_list.append(i.text)
     result = '\n'.join(my_list)
 
-    with open("ösym.png", 'rb') as f:  # Bu 3 satır alınan ekran görüntüsünü Apprise.Attachment türüne çeviriyor.
-        file_contents = f.read()
-        return AppriseAttachment(filename="ösym.png", byte_content=file_contents)
-
 
 def dosya_okuma() -> None:
     global content
@@ -76,7 +71,7 @@ def dosya_okuma() -> None:
     discordsend("dosya okundu")
 
 
-def konu_ac(sinav_adi, url, attachment) -> None:
+def konu_ac(sinav_adi, url) -> None:
     discordsend("farklılık tespit edildi")
     with open("newfile.txt", "w", encoding="utf-8") as f:
         f.write(result)
@@ -86,7 +81,7 @@ def konu_ac(sinav_adi, url, attachment) -> None:
     link2 = link.get_attribute("href")
     discordsend("mevcut url alındı")
 
-    apobj.notify(body=f'Yeni Sınav Sonucu:\n{first_line}\n{link2}', attach=attachment)
+    apobj.notify(body=f'Yeni Sınav Sonucu:\n{first_line}\n{link2}', attach="ösym.png")
     driver.get(url)
     cookies = pickle.load(open("cookies.pkl", "rb"))
     for cookie in cookies:
@@ -112,34 +107,34 @@ def konu_ac(sinav_adi, url, attachment) -> None:
     apobj.notify(body=f"Konu açtım: \n {current_url2}")
 
 
-def kontrol(attachment) -> None:
+def kontrol() -> None:
     if content != result and result != "":
         if "YKS" in my_list[0]:
-            konu_ac("YKS", yks_url, attachment)
+            konu_ac("YKS", yks_url)
 
         elif "MSÜ" in my_list[0]:
-            konu_ac("MSÜ", msu_url, attachment)
+            konu_ac("MSÜ", msu_url)
 
         elif "ALES" in my_list[0]:
-            konu_ac("ALES", ales_url, attachment)
+            konu_ac("ALES", ales_url)
 
         elif "YDS" in my_list[0]:
-            konu_ac("YDS", yds_url, attachment)
+            konu_ac("YDS", yds_url)
 
         elif "(TUS)" in my_list[0] or "(DUS)" in my_list[0] or "(YDUS)" in my_list[0] or "(EUS)" in my_list[0]:
-            konu_ac("TUS/DUS/YDUS/EUS", tusvb_url, attachment)
+            konu_ac("TUS/DUS/YDUS/EUS", tusvb_url)
 
         elif "KPSS" in my_list[0]:
-            konu_ac("KPSS", kpss_url, attachment)
+            konu_ac("KPSS", kpss_url)
 
 
 def main():
     while True:
         try:
             load_dotenv()
-            attachment = osym_giris()
+            osym_giris()
             dosya_okuma()
-            kontrol(attachment)
+            kontrol()
             time.sleep(20)
         except Exception as Ex:
             discorderror(Ex)
